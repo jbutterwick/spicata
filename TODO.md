@@ -1,0 +1,3 @@
+- [ ] implement sqlite db
+- [ ] data ingestion tool
+- [ ] add leptos dependency
