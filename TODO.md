@@ -1,3 +1,2 @@
-- [ ] implement sqlite db
-- [ ] data ingestion tool
-- [ ] add leptos dependency
+- [ ] docker compose file
+- [ ] how to run/use

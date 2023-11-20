@@ -287,6 +287,27 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e496a50fda8aacccc86d7529e2c1e0892dbd0f898a6b5645b5561b89c3210efa"
 
 [[package]]
+name = "csv"
+version = "1.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ac574ff4d437a7b5ad237ef331c17ccca63c46479e5b5453eb8e10bb99a759fe"
+dependencies = [
+ "csv-core",
+ "itoa",
+ "ryu",
+ "serde",
+]
+
+[[package]]
+name = "csv-core"
+version = "0.1.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5efa2b3d7902f4b634a20cae3c9c4e6209dc4779feb6863329607560143efa70"
+dependencies = [
+ "memchr",
+]
+
+[[package]]
 name = "derive-where"
 version = "1.2.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -452,6 +473,12 @@ name = "gimli"
 version = "0.28.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6fb8d784f27acf97159b40fc4db5ecd8aa23b9ad5ef69cdd136d3bc80665f0c0"
+
+[[package]]
+name = "glob"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d2fabcfbdc87f4758337ca535fb41a6d701b65693ce38287d856d1674551ec9b"
 
 [[package]]
 name = "gloo-net"
@@ -686,7 +713,6 @@ dependencies = [
  "tracing",
  "typed-builder",
  "typed-builder-macro",
- "wasm-bindgen",
  "web-sys",
 ]
 
@@ -784,7 +810,6 @@ dependencies = [
  "cfg-if",
  "futures",
  "indexmap",
- "js-sys",
  "paste",
  "pin-project",
  "rkyv",
@@ -795,10 +820,9 @@ dependencies = [
  "serde_json",
  "slotmap",
  "thiserror",
+ "tokio",
  "tracing",
- "wasm-bindgen",
  "wasm-bindgen-futures",
- "web-sys",
 ]
 
 [[package]]
@@ -1371,6 +1395,7 @@ dependencies = [
  "ciborium",
  "const_format",
  "gloo-net",
+ "inventory",
  "js-sys",
  "lazy_static",
  "once_cell",
@@ -1466,7 +1491,10 @@ dependencies = [
 name = "spicata"
 version = "0.1.0"
 dependencies = [
+ "csv",
+ "glob",
  "leptos",
+ "serde",
 ]
 
 [[package]]
