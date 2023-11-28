@@ -131,7 +131,7 @@ async function __wbg_init(input) {
     if (wasm !== undefined) return wasm;
 
     if (typeof input === 'undefined') {
-        input = new URL('spicata-e0b9b652454be792_bg.wasm', import.meta.url);
+        input = new URL('spicata-f9da2ea414bdf714_bg.wasm', import.meta.url);
     }
     const imports = __wbg_get_imports();
 

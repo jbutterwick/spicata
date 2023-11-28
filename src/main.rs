@@ -1,11 +1,12 @@
 mod transactions;
 
-use std::fs;
+use chrono::{DateTime, Utc};
 use leptos::*;
 use transactions::Transaction;
 use glob::glob;
 use csv::Reader;
-use crate::transactions::TransactionType;
+use crate::transactions::{Category, TransactionType};
+use itertools::{Itertools};
 
 struct AccountData {
     net_worth: f32,
@@ -27,6 +28,41 @@ impl Default for AccountData {
     }
 }
 
+struct CategoryData {
+    category: Category,
+    total_spend: f32,
+    date: DateTime<Utc>,
+}
+
+impl CategoryData {
+    fn new(category:Category, total_spend:f32, date:DateTime<Utc>) -> Self {
+        CategoryData {
+            category,
+            total_spend,
+            date,
+        }
+    }
+}
+
+impl Default for CategoryData {
+    fn default() -> CategoryData {
+        CategoryData {
+            category: Category::default(),
+            total_spend: 0.00,
+            date: DateTime::default(),
+        }
+    }
+}
+
+
+fn accumulate_account_data(mut acc:AccountData, rec:&Transaction) -> AccountData {
+    match rec.transaction_type {
+        TransactionType::Credit => {acc.net_worth += rec.amount}
+        TransactionType::Debit => {acc.net_worth -= rec.amount}
+    }
+    acc
+}
+
 
 #[component]
 fn App() -> impl IntoView {
@@ -44,32 +80,27 @@ fn App() -> impl IntoView {
             }
         }
     );
-    let account_data = data.iter().fold(AccountData::default(), |mut acc, record| {
-        match record.transaction_type {
-            TransactionType::Credit => {acc.net_worth += record.amount}
-            TransactionType::Debit => {acc.net_worth -= record.amount}
-        }
-        acc
-    });
-    let spending_data = data.iter().fold(AccountData::default(), |mut acc, record| {
-        match record.transaction_type {
-            TransactionType::Credit => {acc.net_worth += record.amount}
-            TransactionType::Debit => {acc.net_worth -= record.amount}
-        }
-        acc
-    });
-    let trends_data = data.iter().fold(AccountData::default(), |mut acc, record| {
-        match record.transaction_type {
-            TransactionType::Credit => {acc.net_worth += record.amount}
-            TransactionType::Debit => {acc.net_worth -= record.amount}
-        }
-        acc
-    });
+
+    let account_data = data.iter().fold(AccountData::default(), accumulate_account_data);
+
+    let mut grouped_by_category:Vec<(Category, Vec<Transaction>)> = Vec::new();
+    for (key, group) in &data.into_iter().group_by(|elt| elt.category) {
+        grouped_by_category.push((key, group.collect()));
+    }
+
+    let spending_data: Vec<CategoryData> = grouped_by_category.iter().map(|(category, run)| {
+        run.iter().fold(CategoryData::new(category.clone(), 0.00, DateTime::default()), |mut acc, record| {
+            match record.transaction_type {
+                TransactionType::Credit => {acc.total_spend += record.amount}
+                TransactionType::Debit => {acc.total_spend -= record.amount}
+            }
+            acc
+        })
+    }).collect();
 
     view! {
         <AccountSummary data=account_data/>
         <SpendingOverview data=spending_data/>
-        <TrendsSummary data=trends_data/>
     }
 }
 
@@ -94,20 +125,25 @@ fn AccountSummary(
 }
 
 #[component]
-fn SpendingOverview(data:AccountData) -> impl IntoView {
+fn SpendingOverview(data:Vec<CategoryData>) -> impl IntoView {
+    let categories = data.iter()
+        .map(|item| {
+            view! {
+                <li>
+                    <span>{item.category.to_string()} :</span>
+                    <span>{item.total_spend}</span>
+                    <span>{item.date.to_string()}</span>
+                </li>
+            }
+        })
+        .collect::<Vec<_>>();
+
     view! {
-        <h2>"Spending"</h2>
-        <span>{data.net_worth}</span>
+        <h2>"Spending by Category"</h2>
+        <ul>{categories}</ul>
     }
 }
 
-#[component]
-fn TrendsSummary(data:AccountData) -> impl IntoView {
-    view! {
-        <h2>"Trends"</h2>
-        <span>{data.net_worth}</span>
-    }
-}
 fn main() {
-    leptos::mount_to_body(App)
+    mount_to_body(App)
 }
